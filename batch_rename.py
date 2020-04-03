@@ -3,8 +3,7 @@ import shutil
 from datetime import datetime
 
 '''
-    For the given path, get the List of all files in the directory tree and move them to specified location. 
-    Bonus: Also removes all empty folders left behind.
+    For the given path, get the List of all files in the directory tree and rename them by specific format. 
 '''
 
 
@@ -26,7 +25,7 @@ def list_files(src_dir):
     return all_file_paths
 
 
-def rename_file_from_src(file_path):
+def rename_file_from_src(file_path, postfix):
     file_dir = os.path.dirname(file_path)
 
     file_name = os.path.basename(file_path)
@@ -36,7 +35,10 @@ def rename_file_from_src(file_path):
     lmd_obj = datetime.strptime(lmd_raw, "%a %b %d %H:%M:%S %Y")
     lmd_formatted = lmd_obj.strftime("%Y%m%d")
 
-    new_name = lmd_formatted + ' ' + name + ' [SEC]' + ext
+    if postfix:
+        new_name = "{} {} [{}]{}".format(lmd_formatted, name, postfix, ext)
+    else:
+        new_name = "{} {}{}".format(lmd_formatted, name, ext)
 
     file_path_new = os.path.join(file_dir, new_name)
 
@@ -46,18 +48,22 @@ def rename_file_from_src(file_path):
 
 
 def main():
-    # destination path. Change here as per convenience.
-    dest_dir = os.getcwd()
+    postfix = raw_input("Enter a desired postfix for the files (HR, SEC etc.) or leave blank.\n")
 
-    # source path. Change here as per convenience.
+    if postfix:
+        print("Renaming all files to the following format: YYYYMMDD <file_name> [{}].".format(postfix))
+    else:
+        print("Renaming all files to the following format: YYYYMMDD <file_name>")
+
+    # current directory in source path. Change here as per convenience.
     src_dir = os.getcwd()
 
     # Get the list of all files in directory tree at given path
     all_files = list_files(src_dir)
 
-    # rename file from src by appending lmd in front :: (LMD_<file_name>)
+    # rename file from src by appending lmd in front :: (LMD_<file_name> [HR,SEC])
     for file_path in all_files:
-        rename_file_from_src(file_path)
+        rename_file_from_src(file_path, postfix)
 
 
 if __name__ == '__main__':
